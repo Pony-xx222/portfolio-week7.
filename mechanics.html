@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanics Phenomena Visualized</title>
+<style>
+  :root {
+    --bg-0: #060403;
+    --bg-1: #120c08;
+    --bg-2: #1d1410;
+    --panel: rgba(28, 19, 14, 0.80);
+    --panel-border: rgba(94, 227, 189, 0.28);
+    --accent: #5ee3bd;
+    --accent-2: #cdf6e8;
+    --text: #f5ead9;
+    --text-dim: #b39880;
+    --danger: #ff7a6b;
+    --ok: #5ee3bd;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: radial-gradient(ellipse at top, #1a110b 0%, var(--bg-0) 60%);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+  }
+
+  /* ========== Title bar ========== */
+  .title-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(18,12,8,0.92), rgba(18,12,8,0.35));
+    border-bottom: 1px solid var(--panel-border);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    pointer-events: none;
+  }
+  .title-bar h1 {
+    margin: 0;
+    font-size: 19px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent-2), #d9a97c, var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 16px rgba(94, 227, 189, 0.25);
+    font-weight: 600;
+  }
+  .title-bar .back {
+    position: absolute;
+    left: 16px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: auto;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    padding: 6px 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: rgba(40,27,19,0.7);
+    transition: all 0.2s;
+  }
+  .title-bar .back:hover { color: var(--accent-2); border-color: var(--accent); }
+
+  /* ========== Canvas ========== */
+  #stage {
+    position: absolute;
+    inset: 0;
+    display: block;
+    cursor: crosshair;
+  }
+
+  /* ========== Control panel ========== */
+  .panel {
+    position: absolute;
+    top: 70px;
+    left: 16px;
+    width: 230px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    z-index: 5;
+    box-shadow: 0 8px 32px rgba(94, 227, 189, 0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+    backdrop-filter: blur(10px);
+  }
+  .panel h2 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    font-weight: 600;
+  }
+  .ctrl { margin-bottom: 10px; }
+  .ctrl label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .ctrl label .val { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .ctrl input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #2b1e16, #4a3427);
+    border-radius: 2px;
+    outline: none;
+  }
+  .ctrl input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 10px var(--accent-2);
+    cursor: pointer;
+  }
+  .ctrl input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 10px var(--accent-2);
+    cursor: pointer;
+  }
+
+  /* Toggles */
+  .toggles { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+  .toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--text);
+    cursor: pointer;
+  }
+  .toggle .sw {
+    width: 34px; height: 18px;
+    background: #2b1e16;
+    border-radius: 9px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .toggle .sw::after {
+    content: "";
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    background: #8a6d55;
+    border-radius: 50%;
+    transition: all 0.2s;
+  }
+  .toggle.on .sw { background: rgba(94, 227, 189, 0.35); }
+  .toggle.on .sw::after { background: var(--accent-2); left: 18px; box-shadow: 0 0 8px var(--accent-2); }
+
+  /* Buttons */
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+  .btn {
+    background: linear-gradient(180deg, rgba(74,52,39,0.7), rgba(40,28,20,0.7));
+    color: var(--text);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 7px 8px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn:hover { border-color: var(--accent-2); color: var(--accent-2); }
+  .btn:active { transform: translateY(1px); }
+  .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .btn.wide { grid-column: span 2; }
+
+  /* Ball count */
+  .counter {
+    position: absolute;
+    top: 18px; right: 22px;
+    z-index: 10;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    backdrop-filter: blur(10px);
+  }
+  .counter .n {
+    color: var(--accent-2);
+    font-size: 18px;
+    font-weight: 600;
+    margin-left: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .counter .cap {
+    color: var(--text-dim);
+    font-size: 11px;
+    margin-left: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .counter .cap-indicator {
+    display: block;
+    margin-top: 4px;
+    font-size: 9px;
+    color: var(--danger);
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .counter.is-capped .cap-indicator { opacity: 1; }
+  .counter.is-capped .n { color: var(--danger); }
+
+  /* Hint bar */
+  .hint {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    background: rgba(18, 12, 8, 0.65);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 8px 18px;
+    backdrop-filter: blur(6px);
+    white-space: nowrap;
+  }
+  .hint kbd {
+    background: #2b1e16;
+    border: 1px solid #4a3427;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text);
+  }
+
+  /* Paused overlay dot */
+  .pause-badge {
+    position: absolute;
+    top: 72px; right: 22px;
+    z-index: 10;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--danger);
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .paused .pause-badge { opacity: 1; }
+
+  /* Slingshot preview */
+  #sling {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+</style>
+</head>
+<body>
+
+<div class="title-bar">
+  <a class="back" href="projects.html">← Projects</a>
+  <h1>Mechanics Phenomena Visualized</h1>
+</div>
+
+<canvas id="stage"></canvas>
+
+<div class="panel">
+  <h2>Controls</h2>
+
+  <div class="ctrl">
+    <label>Gravity <span class="val" id="gVal">1.00</span></label>
+    <input type="range" id="gravity" min="0" max="3" step="0.01" value="1">
+  </div>
+
+  <div class="ctrl">
+    <label>Expansion <span class="val" id="expVal">0.00</span></label>
+    <input type="range" id="expansion" min="-0.05" max="0.05" step="0.001" value="0">
+  </div>
+
+  <div class="ctrl">
+    <label>New Mass <span class="val" id="massVal">12</span></label>
+    <input type="range" id="newMass" min="3" max="60" step="1" value="12">
+  </div>
+
+  <div class="toggles">
+    <div class="toggle on" data-toggle="trails"><span>Motion Trails</span><span class="sw"></span></div>
+    <div class="toggle on" data-toggle="merge"><span>Merge on Collision</span><span class="sw"></span></div>
+  </div>
+
+  <div class="btns">
+    <button class="btn" id="pauseBtn">Pause</button>
+    <button class="btn danger" id="clearBtn">Clear</button>
+    <button class="btn wide" id="galaxyBtn">✦ Galaxy</button>
+    <button class="btn wide" id="binaryBtn">⚥ Binary</button>
+  </div>
+</div>
+
+<div class="counter" id="counterEl">Bodies<span class="n" id="count">0</span><span class="cap" id="capInfo">/ 80</span><span class="cap-indicator" id="capFlash" hidden>LIMIT REACHED</span></div>
+<div class="pause-badge">PAUSED</div>
+
+<div class="hint">
+  Drag to launch a body — Click to place at rest — sliders tune G &amp; expansion
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const canvas = document.getElementById("stage");
+  const ctx = canvas.getContext("2d");
+
+  let W = 0, H = 0, cx = 0, cy = 0;
+  function resize() {
+    W = canvas.width = window.innerWidth * devicePixelRatio;
+    H = canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    cx = window.innerWidth / 2;
+    cy = window.innerHeight / 2;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  // ========== State ==========
+  const bodies = [];
+  let paused = false;
+  let showTrails = true;
+  let mergeEnabled = true;
+  let G = 1.0;
+  let expansion = 0.0;
+  let newMass = 12;
+  const SOFTEN = 8;       // prevents singularity
+  const TRAIL_LEN = 60;
+  const MAX_BODIES = 80;  // hard cap to prevent lag ("kartun")
+  let cappedMsgTimer = 0;
+
+  // Add a body, evicting if we exceed MAX_BODIES.
+  // Keeps the heaviest bodies (stars) and drops the smallest/oldest first.
+  function pushBody(b) {
+    if (bodies.length >= MAX_BODIES) {
+      // Find the lightest body that isn't the sole heavy one, drop it.
+      let worstIdx = -1, worstScore = Infinity;
+      for (let i = 0; i < bodies.length; i++) {
+        const body = bodies[i];
+        // Prefer removing the lightest; tie-break by oldest
+        const score = body.m * 10000 + i;
+        if (score < worstScore) { worstScore = score; worstIdx = i; }
+      }
+      if (worstIdx >= 0) bodies.splice(worstIdx, 1);
+      cappedMsgTimer = 90; // ~1.5s flash
+    }
+    bodies.push(b);
+  }
+
+  // ========== Body ==========
+  class Body {
+    constructor(x, y, vx, vy, m) {
+      this.x = x; this.y = y;
+      this.vx = vx; this.vy = vy;
+      this.m = m;
+      this.r = Math.max(3, Math.sqrt(m) * 1.4);
+      this.trail = [];
+      this.dead = false;
+    }
+    // color: heavier -> reddish, lighter -> bluish-white
+    color() {
+      // mass 3..~200  -> t 0..1
+      const t = Math.min(1, (Math.log(this.m) - Math.log(3)) / (Math.log(80) - Math.log(3)));
+      // lighter: cyan/white -> heavier: orange/red
+      const rL = 180, gL = 220, bL = 255; // light (bluish)
+      const rH = 255, gH = 90,  bH = 40;  // heavy (reddish)
+      const r = Math.round(rL + (rH - rL) * t);
+      const g = Math.round(gL + (gH - gL) * t);
+      const b = Math.round(bL + (bH - bL) * t);
+      return `rgb(${r},${g},${b})`;
+    }
+    step(dt) {
+      // Expansion: small outward drift from center (stable, not runaway)
+      if (expansion !== 0) {
+        const dx = this.x - cx, dy = this.y - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+        this.vx += (dx / dist) * expansion * dist * 0.01;
+        this.vy += (dy / dist) * expansion * dist * 0.01;
+      }
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+      if (showTrails) {
+        this.trail.push([this.x, this.y]);
+        if (this.trail.length > TRAIL_LEN) this.trail.shift();
+      } else if (this.trail.length) {
+        this.trail.length = 0;
+      }
+    }
+  }
+
+  // ========== Physics step ==========
+  function computeForces() {
+    const n = bodies.length;
+    const ax = new Float64Array(n);
+    const ay = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      if (bodies[i].dead) continue;
+      for (let j = i + 1; j < n; j++) {
+        if (bodies[j].dead) continue;
+        const dx = bodies[j].x - bodies[i].x;
+        const dy = bodies[j].y - bodies[i].y;
+        const r2 = dx*dx + dy*dy + SOFTEN*SOFTEN;
+        const r = Math.sqrt(r2);
+        const f = (G * bodies[i].m * bodies[j].m) / r2;
+        const fx = f * dx / r;
+        const fy = f * dy / r;
+        ax[i] += fx / bodies[i].m;
+        ay[i] += fy / bodies[i].m;
+        ax[j] -= fx / bodies[j].m;
+        ay[j] -= fy / bodies[j].m;
+      }
+    }
+    for (let i = 0; i < n; i++) {
+      if (bodies[i].dead) continue;
+      bodies[i].vx += ax[i];
+      bodies[i].vy += ay[i];
+    }
+  }
+
+  function mergeCollisions() {
+    if (!mergeEnabled) return;
+    for (let i = 0; i < bodies.length; i++) {
+      if (bodies[i].dead) continue;
+      for (let j = i + 1; j < bodies.length; j++) {
+        if (bodies[j].dead) continue;
+        const a = bodies[i], b = bodies[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const minD = a.r + b.r;
+        if (dist < minD) {
+          // merge into the heavier one
+          const [big, small] = a.m >= b.m ? [a, b] : [b, a];
+          const tm = big.m + small.m;
+          big.vx = (big.vx * big.m + small.vx * small.m) / tm;
+          big.vy = (big.vy * big.m + small.vy * small.m) / tm;
+          big.x  = (big.x * big.m + small.x * small.m) / tm;
+          big.y  = (big.y * big.m + small.y * small.m) / tm;
+          big.m  = tm;
+          big.r  = Math.max(3, Math.sqrt(tm) * 1.4);
+          big.trail = [];
+          small.dead = true;
+          break;
+        }
+      }
+    }
+    for (let i = bodies.length - 1; i >= 0; i--) {
+      if (bodies[i].dead) bodies.splice(i, 1);
+    }
+  }
+
+  // ========== Render ==========
+  function draw() {
+    const w = window.innerWidth, h = window.innerHeight;
+    // clear with slight fade for trails
+    if (showTrails) {
+      ctx.fillStyle = "rgba(6, 4, 3, 0.28)";
+    } else {
+      ctx.fillStyle = "#060403";
+    }
+    ctx.fillRect(0, 0, w, h);
+
+    // subtle grid / star field
+    if (!showTrails) {
+      // tiny faint stars — seed once-ish
+      if (!draw._stars) {
+        draw._stars = [];
+        for (let i = 0; i < 120; i++) {
+          draw._stars.push([Math.random() * w, Math.random() * h, Math.random() * 0.6 + 0.2]);
+        }
+      }
+      ctx.fillStyle = "rgba(214,190,166,0.45)";
+      for (const s of draw._stars) {
+        ctx.globalAlpha = s[2];
+        ctx.fillRect(s[0], s[1], 1, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // trails
+    if (showTrails) {
+      for (const b of bodies) {
+        if (b.trail.length < 2) continue;
+        ctx.beginPath();
+        ctx.moveTo(b.trail[0][0], b.trail[0][1]);
+        for (let k = 1; k < b.trail.length; k++) ctx.lineTo(b.trail[k][0], b.trail[k][1]);
+        ctx.strokeStyle = b.color();
+        ctx.globalAlpha = 0.25;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // bodies with glow
+    for (const b of bodies) {
+      const col = b.color();
+      // outer glow
+      const g = ctx.createRadialGradient(b.x, b.y, b.r * 0.5, b.x, b.y, b.r * 3.5);
+      g.addColorStop(0, col);
+      g.addColorStop(0.35, col.replace("rgb", "rgba").replace(")", ",0.35)"));
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r * 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // core
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // bright center
+      const inner = ctx.createRadialGradient(b.x - b.r*0.25, b.y - b.r*0.25, 0, b.x, b.y, b.r);
+      inner.addColorStop(0, "rgba(255,255,255,0.85)");
+      inner.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = inner;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // slingshot preview
+    if (slingshot.active) drawSlingshot();
+  }
+
+  // ========== Loop ==========
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000) * 60; // frames-ish
+    last = now;
+
+    if (!paused) {
+      computeForces();
+      // sub-step merge check twice per frame for stability
+      for (let s = 0; s < 2; s++) {
+        for (const b of bodies) b.step(dt * 0.5);
+        mergeCollisions();
+      }
+      cullOffscreen();
+    }
+    draw();
+    updateCounter();
+    requestAnimationFrame(loop);
+  }
+
+  function cullOffscreen() {
+    const w = window.innerWidth, h = window.innerHeight;
+    const pad = Math.max(w, h) * 2;
+    for (let i = bodies.length - 1; i >= 0; i--) {
+      const b = bodies[i];
+      if (b.x < -pad || b.x > w + pad || b.y < -pad || b.y > h + pad) {
+        bodies.splice(i, 1);
+      }
+    }
+  }
+
+  // ========== Slingshot interaction ==========
+  const slingshot = {
+    active: false, sx: 0, sy: 0, ex: 0, ey: 0
+  };
+
+  function drawSlingshot() {
+    const dx = slingshot.sx - slingshot.ex;
+    const dy = slingshot.sy - slingshot.ey;
+    const speed = Math.min(30, Math.sqrt(dx*dx + dy*dy) * 0.12);
+    // arrow line
+    ctx.strokeStyle = "rgba(94, 227, 189, 0.8)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(slingshot.sx, slingshot.sy);
+    ctx.lineTo(slingshot.ex, slingshot.ey);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // ghost planet
+    ctx.fillStyle = "rgba(94, 227, 189, 0.4)";
+    ctx.beginPath();
+    ctx.arc(slingshot.sx, slingshot.sy, Math.max(3, Math.sqrt(newMass) * 1.4), 0, Math.PI * 2);
+    ctx.fill();
+    // speed label
+    ctx.fillStyle = "rgba(205, 246, 232, 0.9)";
+    ctx.font = "11px monospace";
+    ctx.fillText("v ≈ " + speed.toFixed(1), slingshot.ex + 8, slingshot.ey - 4);
+  }
+
+  canvas.addEventListener("mousedown", (e) => {
+    if (e.button !== 0) return;
+    slingshot.active = true;
+    slingshot.sx = e.clientX;
+    slingshot.sy = e.clientY;
+    slingshot.ex = e.clientX;
+    slingshot.ey = e.clientY;
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!slingshot.active) return;
+    slingshot.ex = e.clientX;
+    slingshot.ey = e.clientY;
+  });
+  window.addEventListener("mouseup", (e) => {
+    if (!slingshot.active) return;
+    slingshot.active = false;
+    const dx = slingshot.sx - e.clientX;
+    const dy = slingshot.sy - e.clientY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const vScale = 0.12;
+    let vx, vy;
+    if (dist < 4) {
+      // click -> place at rest
+      vx = 0; vy = 0;
+    } else {
+      vx = dx * vScale;
+      vy = dy * vScale;
+    }
+    pushBody(new Body(slingshot.sx, slingshot.sy, vx, vy, newMass));
+  });
+
+  // Touch support
+  canvas.addEventListener("touchstart", (e) => {
+    if (!e.touches[0]) return;
+    const t = e.touches[0];
+    slingshot.active = true;
+    slingshot.sx = t.clientX; slingshot.sy = t.clientY;
+    slingshot.ex = t.clientX; slingshot.ey = t.clientY;
+    e.preventDefault();
+  }, { passive: false });
+  canvas.addEventListener("touchmove", (e) => {
+    if (!slingshot.active || !e.touches[0]) return;
+    const t = e.touches[0];
+    slingshot.ex = t.clientX; slingshot.ey = t.clientY;
+    e.preventDefault();
+  }, { passive: false });
+  canvas.addEventListener("touchend", (e) => {
+    if (!slingshot.active) return;
+    slingshot.active = false;
+    const dx = slingshot.sx - slingshot.ex;
+    const dy = slingshot.sy - slingshot.ey;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const vScale = 0.12;
+    if (dist < 4) {
+      pushBody(new Body(slingshot.sx, slingshot.sy, 0, 0, newMass));
+    } else {
+      pushBody(new Body(slingshot.sx, slingshot.sy, dx * vScale, dy * vScale, newMass));
+    }
+  });
+
+  // ========== Controls wiring ==========
+  const gravityEl   = document.getElementById("gravity");
+  const expansionEl = document.getElementById("expansion");
+  const massEl      = document.getElementById("newMass");
+  const gVal        = document.getElementById("gVal");
+  const expVal      = document.getElementById("expVal");
+  const massVal     = document.getElementById("massVal");
+  const countEl     = document.getElementById("count");
+  const pauseBtn    = document.getElementById("pauseBtn");
+  const clearBtn    = document.getElementById("clearBtn");
+  const galaxyBtn   = document.getElementById("galaxyBtn");
+  const binaryBtn   = document.getElementById("binaryBtn");
+
+  gravityEl.addEventListener("input", () => {
+    G = parseFloat(gravityEl.value);
+    gVal.textContent = G.toFixed(2);
+  });
+  expansionEl.addEventListener("input", () => {
+    expansion = parseFloat(expansionEl.value);
+    expVal.textContent = expansion.toFixed(3);
+  });
+  massEl.addEventListener("input", () => {
+    newMass = parseInt(massEl.value, 10);
+    massVal.textContent = newMass;
+  });
+
+  document.querySelectorAll(".toggle").forEach(el => {
+    el.addEventListener("click", () => {
+      el.classList.toggle("on");
+      const which = el.dataset.toggle;
+      if (which === "trails") showTrails = el.classList.contains("on");
+      if (which === "merge")  mergeEnabled = el.classList.contains("on");
+    });
+  });
+
+  pauseBtn.addEventListener("click", () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+    document.body.classList.toggle("paused", paused);
+  });
+
+  clearBtn.addEventListener("click", () => {
+    bodies.length = 0;
+  });
+
+  galaxyBtn.addEventListener("click", spawnGalaxy);
+  binaryBtn.addEventListener("click", spawnBinary);
+
+  const counterEl = document.getElementById("counterEl");
+  const capFlash  = document.getElementById("capFlash");
+
+  function updateCounter() {
+    countEl.textContent = bodies.length;
+    if (cappedMsgTimer > 0) {
+      cappedMsgTimer--;
+      counterEl.classList.add("is-capped");
+    } else {
+      counterEl.classList.remove("is-capped");
+    }
+  }
+
+  // ========== Scene generators ==========
+  function spawnGalaxy() {
+    bodies.length = 0;
+    const w = window.innerWidth, h = window.innerHeight;
+    const SCX = w / 2, SCY = h / 2;
+    // Central star
+    const starMass = 260;
+    bodies.push(new Body(SCX, SCY, 0, 0, starMass));
+
+    // Orbiting disks
+    const nInner = 6, nOuter = 16;
+    const diskR = 90, diskR2 = 220;
+    for (let i = 0; i < nInner; i++) {
+      const a = (i / nInner) * Math.PI * 2 + Math.random() * 0.1;
+      const r = diskR + Math.random() * 20;
+      const x = SCX + Math.cos(a) * r;
+      const y = SCY + Math.sin(a) * r;
+      const v = Math.sqrt(G * starMass / r) * 0.95;
+      const vx = -Math.sin(a) * v;
+      const vy =  Math.cos(a) * v;
+      bodies.push(new Body(x, y, vx, vy, 8 + Math.random() * 10));
+    }
+    for (let i = 0; i < nOuter; i++) {
+      const a = (i / nOuter) * Math.PI * 2 + Math.random() * 0.15;
+      const r = diskR2 + Math.random() * 40;
+      const x = SCX + Math.cos(a) * r;
+      const y = SCY + Math.sin(a) * r;
+      const v = Math.sqrt(G * starMass / r) * 0.92;
+      const vx = -Math.sin(a) * v;
+      const vy =  Math.cos(a) * v;
+      bodies.push(new Body(x, y, vx, vy, 4 + Math.random() * 6));
+    }
+    // Adjust G so orbits feel right at default
+    G = 1.0; gravityEl.value = 1; gVal.textContent = "1.00";
+  }
+
+  function spawnBinary() {
+    bodies.length = 0;
+    const w = window.innerWidth, h = window.innerHeight;
+    const SCX = w / 2, SCY = h / 2;
+
+    // Two large stars orbiting their common COM
+    const mA = 180, mB = 180;
+    const sep = 110;
+    // circular orbit speed: v = sqrt(G * m_total / (4 * r)) approx
+    const mu = mA * mB / (mA + mB);
+    const vRel = Math.sqrt(G * (mA + mB) / sep);
+    const vA = vRel * mB / (mA + mB);
+    const vB = vRel * mA / (mA + mB);
+
+    bodies.push(new Body(SCX - sep/2, SCY, 0, -vA, mA));
+    bodies.push(new Body(SCX + sep/2, SCY, 0,  vB, mB));
+
+    // Asteroids orbiting outside
+    const n = 18;
+    const bigR = sep * 2.4;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + Math.random() * 0.2;
+      const r = bigR + Math.random() * 50;
+      const x = SCX + Math.cos(a) * r;
+      const y = SCY + Math.sin(a) * r;
+      const v = Math.sqrt(G * (mA + mB) / r) * 0.95;
+      const vx = -Math.sin(a) * v;
+      const vy =  Math.cos(a) * v;
+      bodies.push(new Body(x, y, vx, vy, 3 + Math.random() * 4));
+    }
+  }
+
+  // ========== Boot ==========
+  spawnGalaxy();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

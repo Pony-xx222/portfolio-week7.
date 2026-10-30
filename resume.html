@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tianyi Ma — Resume</title>
+  <link rel="stylesheet" href="styles.css">
+  <style media="print">
+    @page { margin: 0; }
+    .nav, .site-footer, .btn { display: none !important; }
+    html, body { margin: 0 !important; }
+    body { background: #fff; padding: 1.05cm 1.3cm 0.3cm; overflow: hidden; }
+    .container { width: auto; max-width: none; }
+    .resume-head { padding: 0 0 0.6rem !important; margin-bottom: 0.6rem !important; }
+    .resume-head__name { margin: 0 0 0.15rem !important; font-size: 1.75rem !important; }
+    .resume-head__title { margin: 0 0 0.35rem !important; font-size: 0.92rem !important; }
+    .resume-head__contact { font-size: 0.85rem !important; }
+    .resume-sections { padding: 0 !important; gap: 0.85rem !important; }
+    .resume-section__title { margin: 0 0 0.55rem !important; padding-bottom: 0.35rem !important; }
+    .resume-summary { font-size: 0.88rem !important; line-height: 1.5 !important; }
+    .exp { gap: 0.7rem !important; }
+    .exp__item { padding-left: 0.9rem !important; }
+    .exp__role { font-size: 0.98rem !important; }
+    .exp__date { font-size: 0.7rem !important; }
+    .exp__org { margin: 0.15rem 0 0.4rem !important; font-size: 0.85rem !important; }
+    .exp__desc { font-size: 0.85rem !important; line-height: 1.45 !important; }
+    .bullets { margin-top: 0.3rem !important; }
+    .bullets li { margin-bottom: 0.12rem !important; font-size: 0.85rem !important; line-height: 1.4 !important; }
+    .skill-card { padding: 0.75rem 0.85rem !important; }
+    .skill-card__head { margin-bottom: 0.5rem !important; }
+    .skill-card__icon { width: 28px; height: 28px; font-size: 0.95rem; }
+    .skill-card__name { font-size: 0.85rem !important; }
+    .chips--skills { gap: 0.35rem !important; }
+    .chips--skills .chip { font-size: 0.72rem !important; padding: 0.22rem 0.55rem !important; }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="index.html" class="brand"><span class="brand__dot"></span> Tianyi Ma</a>
+      <button class="nav__toggle" aria-label="Toggle menu"><span></span></button>
+      <nav class="nav__links">
+        <a href="index.html">Home</a>
+        <a href="resume.html" class="active">Resume</a>
+        <span class="nav__item">
+          <a href="projects.html" class="nav__trigger">Projects</a>
+          <span class="nav__dropdown">
+            <a href="mechanics.html"><span class="dd-ico">🪐</span><span><span class="dd-title">Mechanics</span><span class="dd-sub">Gravity playground</span></span></a>
+            <a href="projects.html#todo"><span class="dd-ico">✅</span><span><span class="dd-title">To-do List</span><span class="dd-sub">Daily planner</span></span></a>
+            <a href="weather.html"><span class="dd-ico">⛅</span><span><span class="dd-title">Weather</span><span class="dd-sub">Quick forecast</span></span></a>
+          </span>
+        </span>
+        <a href="contact.html">Contact Me</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <header class="resume-head">
+      <h1 class="resume-head__name">Tianyi Ma</h1>
+      <p class="resume-head__title">Digital Education Graduate Student · Xi'an Jiaotong-Liverpool University (XJTLU)</p>
+      <p class="resume-head__contact">
+        <a href="mailto:Tianyi.Ma26@student.xjtlu.edu.cn">Tianyi.Ma26@student.xjtlu.edu.cn</a>
+        <span class="dot" aria-hidden="true">·</span>
+        <a href="tel:+8618061172930">+86 18061172930</a>
+      </p>
+      <a class="btn btn--primary" href="resume.pdf" download style="margin-top:0.85rem">Download PDF</a>
+    </header>
+
+    <div class="resume-sections">
+      <!-- Summary -->
+      <section class="resume-section">
+        <h2 class="resume-section__title">Summary</h2>
+        <p class="resume-summary">
+          Graduate student at XJTLU majoring in Digital Education. Curious about how people learn,
+          how tools can help, and how a good photograph tells a story. I enjoy organising ideas,
+          the outdoors, and a calm, friendly kind of progress.
+        </p>
+      </section>
+
+      <!-- Experience -->
+      <section class="resume-section">
+        <h2 class="resume-section__title">Experience</h2>
+        <div class="exp">
+          <div class="exp__item">
+            <div class="exp__head">
+              <h3 class="exp__role">Foreign Trade Assistant (Intern)</h3>
+              <span class="exp__date">Dec 2025 — Jan 2026</span>
+            </div>
+            <p class="exp__org">Zhejiang Weierfei Textile</p>
+            <ul class="bullets">
+              <li>Gathered trade and product data, drafted English emails, and translated documents.</li>
+              <li>Tracked orders and maintained accurate business archives.</li>
+            </ul>
+          </div>
+          <div class="exp__item">
+            <div class="exp__head">
+              <h3 class="exp__role">Campus Experience</h3>
+              <span class="exp__date">Sep 2022 — Sep 2023</span>
+            </div>
+            <p class="exp__org">Nanjing Tech University</p>
+            <ul class="bullets">
+              <li>Operated the WeChat official account and released over 40 articles.</li>
+              <li>Organised more than 15 campus academic events.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Education -->
+      <section class="resume-section">
+        <h2 class="resume-section__title">Education</h2>
+        <div class="exp">
+          <div class="exp__item">
+            <div class="exp__head">
+              <h3 class="exp__role">Graduate Student · Digital Education</h3>
+              <span class="exp__date">2026 — Present</span>
+            </div>
+            <p class="exp__org">Xi'an Jiaotong-Liverpool University (XJTLU)</p>
+            <p class="exp__desc">Exploring how digital tools shape the way we teach and learn — from classroom practice to wider education systems.</p>
+          </div>
+          <div class="exp__item">
+            <div class="exp__head">
+              <h3 class="exp__role">Undergraduate Student</h3>
+              <span class="exp__date">2022 — 2026</span>
+            </div>
+            <p class="exp__org">Nanjing Tech University</p>
+            <p class="exp__desc">Built a steady foundation, picked up research habits, and found a love for tidy, thoughtful work.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Skills -->
+      <section class="resume-section">
+        <h2 class="resume-section__title">Skills</h2>
+        <div class="skills">
+          <div class="skill-card">
+            <div class="skill-card__head">
+              <span class="skill-card__icon">🧰</span>
+              <h3 class="skill-card__name">Tools &amp; Software</h3>
+            </div>
+            <div class="chips chips--skills">
+              <span class="chip">Excel</span>
+              <span class="chip">PowerPoint</span>
+              <span class="chip">Camera</span>
+            </div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-card__head">
+              <span class="skill-card__icon">🌐</span>
+              <h3 class="skill-card__name">Languages</h3>
+            </div>
+            <div class="chips chips--skills">
+              <span class="chip">Chinese <em>Native</em></span>
+              <span class="chip">English <em>Proficient</em></span>
+              <span class="chip">Japanese <em>Conversational</em></span>
+            </div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-card__head">
+              <span class="skill-card__icon">📜</span>
+              <h3 class="skill-card__name">Certifications</h3>
+            </div>
+            <div class="chips chips--skills">
+              <span class="chip">TEM-4</span>
+              <span class="chip">TEM-8</span>
+              <span class="chip">Computer Level 1 Certificate</span>
+              <span class="chip">Mandarin Proficiency Certificate</span>
+              <span class="chip">Teacher Qualification Certificate</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="funfact">
+        <strong>🎲 Fun fact</strong>
+        I once fixed a stubborn bug in my sleep — woke up, typed the line, and it just worked.
+      </div>
+      <small>© <span id="year">2026</span> Tianyi Ma · Made with care</small>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

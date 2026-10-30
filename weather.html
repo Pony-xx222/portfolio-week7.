@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tianyi Ma — Weather</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="index.html" class="brand"><span class="brand__dot"></span> Tianyi Ma</a>
+      <button class="nav__toggle" aria-label="Toggle menu"><span></span></button>
+      <nav class="nav__links">
+        <a href="index.html">Home</a>
+        <a href="resume.html">Resume</a>
+        <span class="nav__item">
+          <a href="projects.html" class="nav__trigger">Projects</a>
+          <span class="nav__dropdown">
+            <a href="mechanics.html"><span class="dd-ico">🪐</span><span><span class="dd-title">Mechanics</span><span class="dd-sub">Gravity playground</span></span></a>
+            <a href="projects.html#todo"><span class="dd-ico">✅</span><span><span class="dd-title">To-do List</span><span class="dd-sub">Daily planner</span></span></a>
+            <a href="weather.html" class="is-active"><span class="dd-ico">⛅</span><span><span class="dd-title">Weather</span><span class="dd-sub">Quick forecast</span></span></a>
+          </span>
+        </span>
+        <a href="contact.html">Contact Me</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-head">
+      <h1>Weather</h1>
+      <p>Check the current weather in any city around the world.</p>
+    </div>
+
+    <section class="section" style="padding-top:1rem;">
+      <div class="weather">
+        <div class="weather__head">
+          <h2>🌤️ Weather Lookup</h2>
+          <p>Enter a city name and press Search.</p>
+        </div>
+
+        <div class="weather__body">
+          <div class="weather__search">
+            <input class="input" type="text" id="cityInput" placeholder="Enter a city (e.g. Beijing)"
+                   autocomplete="off" maxlength="60" aria-label="City name">
+            <button class="btn btn--primary" id="searchBtn" type="button">Search</button>
+          </div>
+
+          <div class="weather__status" id="weatherStatus" role="status" aria-live="polite"></div>
+
+          <div class="weather__result" id="weatherResult" hidden>
+            <div class="weather__icon" id="wIcon">🌤️</div>
+            <div class="weather__temp" id="wTemp">—</div>
+            <div class="weather__cond" id="wCond">—</div>
+            <div class="weather__city" id="wCity">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="funfact">
+        <strong>🎲 Fun fact</strong>
+        I once fixed a stubborn bug in my sleep — woke up, typed the line, and it just worked.
+      </div>
+      <small>© <span id="year">2026</span> Tianyi Ma · Made with care</small>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script>
+  (function () {
+    "use strict";
+
+    var API = "https://uapis.cn/api/v1/misc/weather";
+    // Independent geocoder used only to verify that a searched place exists.
+    // Free, key-less, CORS-enabled, and supports Chinese place names.
+    var GEO_API = "https://geocoding-api.open-meteo.com/v1/search";
+
+    var input    = document.getElementById("cityInput");
+    var btn      = document.getElementById("searchBtn");
+    var statusEl = document.getElementById("weatherStatus");
+    var resultEl = document.getElementById("weatherResult");
+    var iconEl   = document.getElementById("wIcon");
+    var tempEl   = document.getElementById("wTemp");
+    var condEl   = document.getElementById("wCond");
+    var cityEl   = document.getElementById("wCity");
+
+    /* Map the API's weather_icon code to a matching emoji. */
+    function iconFor(code) {
+      var n = parseInt(code, 10);
+      if (isNaN(n)) return "🌤️";
+      if (n === 100) return "☀️";                       // clear
+      if (n === 104) return "☁️";                       // overcast
+      if (n >= 150 && n <= 153) return "🌙";            // clear / cloudy night
+      if (n === 300 || n === 301) return "🌦️";          // shower
+      if (n === 302 || n === 303 || n === 304) return "⛈️"; // thunder
+      if (n >= 305 && n <= 399) return "🌧️";            // rain
+      if (n === 404 || n === 405) return "🌨️";          // sleet
+      if (n >= 400 && n <= 499) return "❄️";            // snow
+      if (n === 503 || n === 504 || n === 507 || n === 508) return "🌪️"; // sand/dust
+      if (n >= 500 && n <= 515) return "🌫️";            // fog / haze
+      if (n === 900) return "🌡️";                       // hot
+      if (n === 901) return "🥶";                       // cold
+      return "⛅";                                      // 101,102,103 + default
+    }
+
+    function showStatus(msg, isErr) {
+      statusEl.textContent = msg;
+      statusEl.classList.add("show");
+      statusEl.classList.toggle("is-error", !!isErr);
+    }
+
+    /* Normalise a place name for comparison: lowercase, keep letters/numbers,
+       collapse everything else to single spaces (CJK-safe). */
+    function normName(s) {
+      return String(s || "").toLowerCase()
+        .replace(/[^\p{L}\p{N}]+/gu, " ")
+        .trim();
+    }
+
+    /* Whether the searched name and a returned name can plausibly refer to
+       the same place: exact match, or a word-boundary prefix such as
+       "New York City" -> "New York". */
+    function nameMatches(query, name) {
+      var a = normName(query);
+      var b = normName(name);
+      if (!a || !b) return false;
+      if (a === b) return true;
+      return a.indexOf(b + " ") === 0 || b.indexOf(a + " ") === 0;
+    }
+
+    function hasCJK(s) {
+      return /[\u3400-\u9fff\uf900-\ufaff]/.test(String(s || ""));
+    }
+
+    /* The weather API sometimes answers 200 OK with a placeholder instead of
+       a real city name: "Unknown", or an adcode-like string such as
+       "CN-810013". Never treat those as real places. */
+    function isRealCityName(name) {
+      if (typeof name !== "string") return false;
+      var n = name.trim();
+      if (!n || /unknown/i.test(n)) return false;
+      if (/\d/.test(n)) return false; // codes like CN-810013 / 110000
+      return true;
+    }
+
+    /* Independently confirm the searched place exists. The weather API
+       occasionally echoes a bogus query straight back as the "city", so its
+       own response is not sufficient proof. */
+    async function placeExists(query) {
+      var lang = hasCJK(query) ? "zh" : "en";
+      var url = GEO_API + "?name=" + encodeURIComponent(query) +
+                "&count=5&language=" + lang;
+      var res = await fetch(url);
+      if (!res.ok) throw new Error("geocoder failed");
+      var data = await res.json();
+      var results = (data && data.results) || [];
+      return results.some(function (p) { return nameMatches(query, p.name); });
+    }
+
+    function clearResult() {
+      iconEl.textContent = "🌤️";
+      tempEl.textContent = "—";
+      condEl.textContent = "—";
+      cityEl.textContent = "—";
+      resultEl.hidden = true;
+    }
+
+    function render(data) {
+      iconEl.textContent = iconFor(data.weather_icon);
+      tempEl.textContent = Math.round(Number(data.temperature)) + "°C";
+      condEl.textContent = data.weather || "";
+      var place = data.city || "";
+      if (data.province && data.province !== data.city) place += ", " + data.province;
+      cityEl.textContent = place;
+      resultEl.hidden = false;
+    }
+
+    async function search() {
+      var city = input.value.trim();
+
+      // Empty box — don't call the API.
+      if (!city) {
+        clearResult();
+        showStatus("Enter a city first.", true);
+        input.focus();
+        return;
+      }
+
+      clearResult();
+      showStatus("Loading…", false);
+      btn.disabled = true;
+
+      try {
+        var res = await fetch(API + "?city=" + encodeURIComponent(city) + "&lang=en");
+        var data = null;
+        try { data = await res.json(); } catch (e) { data = null; }
+
+        // Explicit "no such place" (404 LOCATION_NOT_FOUND) and rejected
+        // city names (400 INVALID_PARAMETER).
+        if (res.status === 404 ||
+            (data && (data.error === "LOCATION_NOT_FOUND" ||
+                      data.code === "INVALID_PARAMETER"))) {
+          showStatus("Couldn't find that city — check the spelling.", true);
+          return;
+        }
+        if (!res.ok || !data) {
+          showStatus("Couldn't load the weather — please try again.", true);
+          return;
+        }
+
+        // Payload validation — the API may return 200 with placeholder data.
+        var temp = Number(data.temperature);
+        if (!isRealCityName(data.city) ||
+            typeof data.weather !== "string" || !data.weather.trim() ||
+            !isFinite(temp)) {
+          showStatus("Couldn't find that city — check the spelling.", true);
+          return;
+        }
+
+        // The returned place must correspond to what was actually searched.
+        // For Chinese-script queries the en-language API answers with the
+        // English name, so the geocoder step below performs that check.
+        if (!hasCJK(city) &&
+            !nameMatches(city, data.city) &&
+            !(data.province && nameMatches(city, data.province))) {
+          showStatus("Couldn't find that city — check the spelling.", true);
+          return;
+        }
+
+        // Independent existence check, so a fabricated/echoed city name with
+        // invented weather can never be displayed.
+        var exists;
+        try {
+          exists = await placeExists(city);
+        } catch (e) {
+          // Can't verify truthfulness — do not show anything as fact.
+          showStatus("Couldn't load the weather — please try again.", true);
+          return;
+        }
+        if (!exists) {
+          showStatus("Couldn't find that city — check the spelling.", true);
+          return;
+        }
+
+        statusEl.classList.remove("show");
+        render(data);
+      } catch (e) {
+        showStatus("Couldn't load the weather — please try again.", true);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener("click", search);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); search(); }
+    });
+  })();
+  </script>
+</body>
+</html>

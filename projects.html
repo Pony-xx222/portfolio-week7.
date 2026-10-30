@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tianyi Ma — Projects</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="index.html" class="brand"><span class="brand__dot"></span> Tianyi Ma</a>
+      <button class="nav__toggle" aria-label="Toggle menu"><span></span></button>
+      <nav class="nav__links">
+        <a href="index.html">Home</a>
+        <a href="resume.html">Resume</a>
+        <span class="nav__item">
+          <a href="projects.html" class="nav__trigger active">Projects</a>
+          <span class="nav__dropdown">
+            <a href="mechanics.html"><span class="dd-ico">🪐</span><span><span class="dd-title">Mechanics</span><span class="dd-sub">Gravity playground</span></span></a>
+            <a href="projects.html#todo"><span class="dd-ico">✅</span><span><span class="dd-title">To-do List</span><span class="dd-sub">Daily planner</span></span></a>
+            <a href="weather.html"><span class="dd-ico">⛅</span><span><span class="dd-title">Weather</span><span class="dd-sub">Quick forecast</span></span></a>
+          </span>
+        </span>
+        <a href="contact.html">Contact Me</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-head">
+      <h1>My Projects</h1>
+      <p>A little collection of things I've built — pick one and have a look around.</p>
+    </div>
+
+    <section class="section" style="padding-top:1rem;">
+      <div class="section__head">
+        <h2>Featured Projects</h2>
+        <p>Three little apps — click any card to open it.</p>
+      </div>
+      <div class="cards projects-grid">
+        <a class="card" href="mechanics.html" style="text-decoration:none;color:inherit;">
+          <div class="card__emoji">🪐</div>
+          <h3>Mechanics Phenomena Visualized</h3>
+          <p>A dark, futuristic gravity playground — drag to sling planets, watch galaxies and binaries come alive, and tune the universe with sliders.</p>
+          <span class="card__cta">Open physics sim →</span>
+        </a>
+        <a class="card" href="#todo" style="text-decoration:none;color:inherit;">
+          <div class="card__emoji">✅</div>
+          <h3>To-do List</h3>
+          <p>A friendly little planner — pick a date, jot a task, and keep your days in order.</p>
+          <span class="card__cta">Open to-do list →</span>
+        </a>
+        <a class="card" href="weather.html" style="text-decoration:none;color:inherit;">
+          <div class="card__emoji">⛅</div>
+          <h3>Weather</h3>
+          <p>Look up the weather anywhere in the world with a clean, quick forecast.</p>
+          <span class="card__cta">Open weather app →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:1rem;" id="todo">
+      <div class="todo">
+        <div class="todo__head">
+          <h2>✅ My To-Do List</h2>
+          <p>Select a date on the calendar, type your task, and press Add.</p>
+        </div>
+
+        <div class="todo__body">
+          <div class="todo__status" id="todoStatus"></div>
+          <!-- Search -->
+          <div class="todo__search">
+            <span class="todo__search-icon">🔍</span>
+            <input class="input todo__search-input" type="text" id="searchInput" placeholder="Search tasks...">
+            <button class="todo__search-clear" id="searchClear" type="button" aria-label="Clear search">✕</button>
+          </div>
+
+          <!-- Calendar -->
+          <div class="cal" id="cal">
+            <div class="cal__top">
+              <button class="cal__btn" id="prevMonth" aria-label="Previous month">‹</button>
+              <div class="cal__month" id="calMonth">—</div>
+              <button class="cal__btn" id="nextMonth" aria-label="Next month">›</button>
+            </div>
+            <div class="cal__weekdays">
+              <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span>
+              <span>Thu</span><span>Fri</span><span>Sat</span>
+            </div>
+            <div class="cal__grid" id="calGrid"></div>
+          </div>
+
+          <!-- Add task -->
+          <div class="todo__selected-date" id="selectedDate">
+            Selected: <strong>—</strong>
+          </div>
+          <div class="todo__add">
+            <input class="input" type="text" id="taskInput" placeholder="What do you need to do?" maxlength="120">
+            <button class="btn btn--primary" id="addBtn">Add</button>
+          </div>
+          <div class="todo__prio" id="prioPicker">
+            <span class="todo__prio-label">Priority:</span>
+            <button class="prio-pill prio--low"    data-prio="low" type="button">🟢 Low</button>
+            <button class="prio-pill prio--medium is-on" data-prio="medium" type="button">🟡 Medium</button>
+            <button class="prio-pill prio--high"   data-prio="high" type="button">🔴 High</button>
+          </div>
+
+          <!-- List -->
+          <ul class="todo__list" id="todoList"></ul>
+
+          <div class="todo__empty" id="emptyState" style="display:none;">
+            <span>🗒️</span>
+            No tasks yet. Pick a date and add your first one!
+          </div>
+
+          <div class="todo__footer" id="todoFooter" style="display:none;">
+            <span id="counter">0 tasks</span>
+            <button class="todo__clear" id="clearDone">Clear completed</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="funfact">
+        <strong>🎲 Fun fact</strong>
+        I once fixed a stubborn bug in my sleep — woke up, typed the line, and it just worked.
+      </div>
+      <small>© <span id="year">2026</span> Tianyi Ma · Made with care</small>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    "use strict";
+
+    /* ---------- Supabase config ---------- */
+    var SUPA_URL = "https://zxciynrkunjvzhxjsrgy.supabase.co";
+    var SUPA_KEY = "sb_publishable_wu0fGfkI8n3AehFK6Ydw-Q__sSnz__k";
+    var TABLE = "todos";
+    var LS_KEY = "tianyi_todos_v1";
+
+    var sb = null;
+    var dbOK = false;
+    try {
+      if (window.supabase && window.supabase.createClient) {
+        sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+      }
+    } catch (e) {
+      console.warn("Supabase init:", e);
+    }
+
+    var MONTHS = ["January","February","March","April","May","June","July",
+                  "August","September","October","November","December"];
+    var PRIOS = {
+      low:    { emoji: "🟢", label: "Low" },
+      medium: { emoji: "🟡", label: "Medium" },
+      high:   { emoji: "🔴", label: "High" }
+    };
+    var currentPriority = "medium";
+    var searchQuery = "";
+
+    // ---------- State ----------
+    var tasks = [];
+    var viewDate = new Date();       // first day of displayed month
+    viewDate.setDate(1);
+    var selectedDate = new Date();  // default to today
+    var statusTimer = null;
+
+    // ---------- DOM ----------
+    var calMonth = document.getElementById("calMonth");
+    var calGrid  = document.getElementById("calGrid");
+    var prevBtn  = document.getElementById("prevMonth");
+    var nextBtn  = document.getElementById("nextMonth");
+    var selBox   = document.getElementById("selectedDate");
+    var taskInput= document.getElementById("taskInput");
+    var addBtn   = document.getElementById("addBtn");
+    var listEl   = document.getElementById("todoList");
+    var emptyEl  = document.getElementById("emptyState");
+    var footerEl = document.getElementById("todoFooter");
+    var counter  = document.getElementById("counter");
+    var clearBtn = document.getElementById("clearDone");
+    var prioPicker = document.getElementById("prioPicker");
+    var searchInput = document.getElementById("searchInput");
+    var searchClear = document.getElementById("searchClear");
+    var statusEl = document.getElementById("todoStatus");
+
+    // ---------- Helpers ----------
+    function startOfDay(d) {
+      var x = new Date(d);
+      x.setHours(0, 0, 0, 0);
+      return x;
+    }
+    function sameDay(a, b) {
+      return startOfDay(a).getTime() === startOfDay(b).getTime();
+    }
+    function toDateString(d) {
+      var x = startOfDay(d);
+      var m = x.getMonth() + 1;
+      var day = x.getDate();
+      return x.getFullYear() + "-" + (m < 10 ? "0" + m : m) + "-" + (day < 10 ? "0" + day : day);
+    }
+    function fmtDate(d) {
+      if (typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+        var p = d.split("-");
+        return p[1] + "/" + p[2];
+      }
+      var x = new Date(d);
+      var m = x.getMonth() + 1;
+      var day = x.getDate();
+      return (m < 10 ? "0" + m : m) + "/" + (day < 10 ? "0" + day : day);
+    }
+    function fmtSelected() {
+      return selectedDate.toLocaleDateString("en-US",
+        { weekday: "short", month: "short", day: "numeric" });
+    }
+    function mapRow(r) {
+      return {
+        id: r.id,
+        text: r.task || r.text || "",
+        done: !!r.done,
+        priority: r.priority || "medium",
+        date: r.date || r.task_date || null,
+        createdAt: r.created_at ? new Date(r.created_at).getTime() : 0
+      };
+    }
+    function showStatus(msg, isErr) {
+      if (!statusEl) { console.error(msg); return; }
+      statusEl.textContent = msg;
+      statusEl.style.display = "block";
+      statusEl.classList.toggle("is-error", !!isErr);
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(function () { statusEl.style.display = "none"; }, 4500);
+    }
+
+    // ---------- LocalStorage fallback ----------
+    function lsSave() {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(tasks)); } catch (e) {}
+    }
+    function lsLoad() {
+      try {
+        var raw = localStorage.getItem(LS_KEY);
+        if (!raw) return null;
+        var arr = JSON.parse(raw);
+        if (!Array.isArray(arr)) return null;
+        return arr.map(function (r) {
+          return {
+            id: r.id || ("l_" + Math.random().toString(36).slice(2, 10)),
+            text: r.text || r.task || "",
+            done: !!r.done,
+            priority: r.priority || "medium",
+            date: r.date || null,
+            createdAt: r.createdAt || Date.now()
+          };
+        });
+      } catch (e) { return null; }
+    }
+    function nextLocalId() {
+      return "l_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    }
+
+    // ---------- Supabase operations with LS fallback ----------
+    async function fetchTasks() {
+      // Always start from localStorage — instant, never fails
+      var ls = lsLoad();
+      tasks = ls || [];
+
+      // Probe Supabase in the background; if it works, merge remotely
+      if (sb && typeof sb.from === "function") {
+        var probeTimer = null;
+        var probePromise = Promise.race([
+          sb.from(TABLE).select("*").order("created_at", { ascending: false }),
+          new Promise(function (_, rej) { probeTimer = setTimeout(function () { rej(new Error("timeout")); }, 3000); })
+        ]);
+        probePromise.then(function (res) {
+          if (probeTimer) clearTimeout(probeTimer);
+          if (res && !res.error && Array.isArray(res.data)) {
+            dbOK = true;
+            var remote = res.data.map(mapRow);
+            // merge: keep all local, prefer remote for duplicate ids
+            var remoteById = {};
+            remote.forEach(function (r) { remoteById[r.id] = r; });
+            var merged = [];
+            tasks.forEach(function (t) {
+              if (remoteById[t.id]) merged.push(remoteById[t.id]);
+              else merged.push(t);
+            });
+            // add remote-only
+            var localIds = {}; tasks.forEach(function (t) { localIds[t.id] = true; });
+            remote.forEach(function (r) { if (!localIds[r.id]) merged.push(r); });
+            tasks = merged;
+            lsSave();
+            renderList();
+          }
+        }).catch(function () {
+          dbOK = false;
+          // Supabase failed — we already have local tasks loaded; done.
+        });
+      }
+    }
+
+    async function insertTask(text) {
+      var row = {
+        task: text, done: false, priority: currentPriority,
+        date: toDateString(selectedDate)
+      };
+      var localTask = {
+        id: nextLocalId(), text: text, done: false,
+        priority: currentPriority, date: row.date, createdAt: Date.now()
+      };
+      // Save locally IMMEDIATELY — this is the source of truth
+      lsSave();
+      // Best-effort push to DB; never wait for it (would block UI)
+      if (sb && typeof sb.from === "function") {
+        sb.from(TABLE).insert(row).select().then(function (res) {
+          if (res && !res.error && res.data && res.data[0]) {
+            dbOK = true;
+            var real = mapRow(res.data[0]);
+            for (var i = 0; i < tasks.length; i++) {
+              if (tasks[i].id === localTask.id) { tasks[i] = real; break; }
+            }
+            lsSave();
+          }
+        }).catch(function () {});
+      }
+      return localTask;
+    }
+
+    async function deleteTask(id) {
+      tasks = tasks.filter(function (t) { return t.id !== id; });
+      lsSave();
+      if (sb && dbOK) { try { await sb.from(TABLE).delete().eq("id", id); } catch (e) {} }
+    }
+
+    async function updateTask(id, patch) {
+      for (var i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === id) {
+          if (patch.done !== undefined) tasks[i].done = patch.done;
+          if (patch.text !== undefined) tasks[i].text = patch.text;
+          if (patch.priority !== undefined) tasks[i].priority = patch.priority;
+          break;
+        }
+      }
+      lsSave();
+      if (sb && dbOK) {
+        var dbPatch = {};
+        if (patch.done !== undefined) dbPatch.done = patch.done;
+        if (patch.text !== undefined) dbPatch.task = patch.text;
+        if (patch.priority !== undefined) dbPatch.priority = patch.priority;
+        try { await sb.from(TABLE).update(dbPatch).eq("id", id); } catch (e) {}
+      }
+    }
+
+    async function clearCompletedDB(ids) {
+      lsSave();
+      if (sb && dbOK && ids.length) {
+        try { await sb.from(TABLE).delete().in("id", ids); } catch (e) {}
+      }
+    }
+
+    // ---------- Calendar render ----------
+    function renderCalendar() {
+      calMonth.textContent = MONTHS[viewDate.getMonth()] + " " + viewDate.getFullYear();
+      calGrid.innerHTML = "";
+
+      var year  = viewDate.getFullYear();
+      var month = viewDate.getMonth();
+      var first = new Date(year, month, 1);
+      var startWd = first.getDay();            // 0=Sun
+      var daysInMonth = new Date(year, month + 1, 0).getDate();
+      var daysInPrev  = new Date(year, month, 0).getDate();
+      var today = startOfDay(new Date());
+
+      // leading days from previous month
+      for (var i = 0; i < startWd; i++) {
+        var d = daysInPrev - startWd + 1 + i;
+        calGrid.appendChild(makeDayCell(d, true, null));
+      }
+      // current month
+      for (var day = 1; day <= daysInMonth; day++) {
+        var cellDate = new Date(year, month, day);
+        calGrid.appendChild(makeDayCell(day, false, cellDate));
+      }
+      // trailing to fill 42 cells (6 weeks)
+      var filled = startWd + daysInMonth;
+      var trail = (filled % 7 === 0) ? 0 : 7 - (filled % 7);
+      for (var t = 1; t <= trail; t++) {
+        calGrid.appendChild(makeDayCell(t, true, null));
+      }
+    }
+
+    function makeDayCell(num, isOther, cellDate) {
+      var el = document.createElement("button");
+      el.className = "cal__day";
+      el.type = "button";
+      el.textContent = num;
+      if (isOther) el.classList.add("is-other");
+      if (cellDate) {
+        var today = startOfDay(new Date());
+        if (sameDay(cellDate, today)) el.classList.add("is-today");
+        if (sameDay(cellDate, selectedDate)) el.classList.add("is-selected");
+        el.addEventListener("click", function () {
+          selectedDate = new Date(cellDate);
+          renderCalendar();
+          renderSelected();
+        });
+      }
+      return el;
+    }
+
+    function renderSelected() {
+      selBox.innerHTML = "Selected: <strong>" + fmtSelected() + "</strong>";
+    }
+
+    // ---------- List render ----------
+    function renderList() {
+      listEl.innerHTML = "";
+
+      var q = searchQuery.trim().toLowerCase();
+      var filtered = tasks.filter(function (t) {
+        if (!q) return true;
+        return t.text.toLowerCase().indexOf(q) !== -1;
+      });
+      // newest first
+      var sorted = filtered.slice().sort(function (a, b) {
+        return b.createdAt - a.createdAt;
+      });
+
+      // No tasks at all
+      if (tasks.length === 0) {
+        setEmptyState("🗒️", "No tasks yet. Pick a date and add your first one!");
+        footerEl.style.display = "none";
+        return;
+      }
+
+      // Search yielded no matches
+      if (sorted.length === 0) {
+        setEmptyState("🔍", 'No tasks match "' + searchQuery + '".');
+        footerEl.style.display = "none";
+        return;
+      }
+
+      emptyEl.style.display = "none";
+      footerEl.style.display = "flex";
+
+      var done = 0;
+      sorted.forEach(function (t) {
+        if (t.done) done++;
+        listEl.appendChild(makeItem(t));
+      });
+      var total = sorted.length;
+      counter.textContent = done + " of " + total + (total === 1 ? " task" : " tasks") + " completed";
+    }
+
+    function setEmptyState(emoji, msg) {
+      emptyEl.innerHTML = "";
+      var icon = document.createElement("span");
+      icon.textContent = emoji;
+      emptyEl.appendChild(icon);
+      emptyEl.appendChild(document.createTextNode(msg));
+      emptyEl.style.display = "block";
+    }
+
+    function makeItem(t) {
+      var li = document.createElement("li");
+      li.className = "todo__item" + (t.done ? " done" : "");
+
+      // checkbox
+      var check = document.createElement("button");
+      check.className = "todo__check";
+      check.type = "button";
+      check.setAttribute("aria-label", "Mark task done");
+      check.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2a160c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      check.addEventListener("click", function () {
+        t.done = !t.done;
+        renderList();
+        updateTask(t.id, { done: t.done });
+      });
+
+      // priority badge
+      var pKey = t.priority || "medium";
+      var prio = document.createElement("span");
+      prio.className = "todo__prio-badge prio--" + pKey;
+      prio.textContent = PRIOS[pKey].emoji;
+      prio.title = PRIOS[pKey].label + " priority";
+
+      // text (click to edit inline)
+      var span = document.createElement("span");
+      span.className = "todo__text";
+      span.textContent = t.text;
+      span.title = "Click to edit";
+      span.addEventListener("click", function () { startEdit(span, t); });
+
+      // date badge
+      var badge = document.createElement("span");
+      badge.className = "todo__date";
+      badge.textContent = t.date ? fmtDate(t.date) : "";
+
+      // delete
+      var del = document.createElement("button");
+      del.className = "todo__del";
+      del.type = "button";
+      del.setAttribute("aria-label", "Delete task");
+      del.innerHTML = "✕";
+      del.addEventListener("click", function () {
+        var id = t.id;
+        deleteTask(id).then(renderList);
+      });
+
+      li.appendChild(check);
+      li.appendChild(prio);
+      li.appendChild(span);
+      li.appendChild(badge);
+      li.appendChild(del);
+      return li;
+    }
+
+    // ---------- Inline edit ----------
+    function startEdit(span, t) {
+      var committed = false;
+      var input = document.createElement("input");
+      input.type = "text";
+      input.className = "todo__edit";
+      input.value = t.text;
+      input.maxLength = 120;
+      span.replaceWith(input);
+      input.focus();
+      input.select();
+
+      function commit() {
+        if (committed) return;
+        committed = true;
+        var val = input.value.trim();
+        var changed = val && val !== t.text;
+        if (changed) { t.text = val; }
+        renderList();
+        if (changed) updateTask(t.id, { text: val });
+      }
+      function cancel() {
+        if (committed) return;
+        committed = true;
+        renderList();
+      }
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); commit(); }
+        else if (e.key === "Escape") { e.preventDefault(); cancel(); }
+      });
+      input.addEventListener("blur", commit);
+    }
+
+    // ---------- Add ----------
+    async function addTask() {
+      var text = taskInput.value.trim();
+      if (!text) {
+        taskInput.focus();
+        taskInput.style.borderColor = "#e57373";
+        setTimeout(function () { taskInput.style.borderColor = ""; }, 1200);
+        return;
+      }
+      addBtn.disabled = true;
+      var created = await insertTask(text);
+      addBtn.disabled = false;
+      if (!created) { taskInput.focus(); return; }
+      tasks.unshift(created);
+      taskInput.value = "";
+      taskInput.focus();
+      renderList();
+    }
+
+    // ---------- Events ----------
+    prevBtn.addEventListener("click", function () {
+      viewDate.setMonth(viewDate.getMonth() - 1);
+      renderCalendar();
+    });
+    nextBtn.addEventListener("click", function () {
+      viewDate.setMonth(viewDate.getMonth() + 1);
+      renderCalendar();
+    });
+    addBtn.addEventListener("click", addTask);
+    taskInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") addTask();
+    });
+    clearBtn.addEventListener("click", function () {
+      var ids = tasks.filter(function (t) { return t.done; }).map(function (t) { return t.id; });
+      tasks = tasks.filter(function (t) { return !t.done; });
+      renderList();
+      clearCompletedDB(ids);
+    });
+    prioPicker.addEventListener("click", function (e) {
+      var btn = e.target.closest(".prio-pill");
+      if (!btn) return;
+      currentPriority = btn.getAttribute("data-prio");
+      prioPicker.querySelectorAll(".prio-pill").forEach(function (p) {
+        p.classList.toggle("is-on", p === btn);
+      });
+    });
+
+    // ---------- Search ----------
+    function applySearch() {
+      searchQuery = searchInput.value;
+      searchClear.classList.toggle("show", searchQuery.length > 0);
+      renderList();
+    }
+    searchInput.addEventListener("input", applySearch);
+    searchInput.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        searchInput.value = "";
+        applySearch();
+        searchInput.blur();
+      }
+    });
+    searchClear.addEventListener("click", function () {
+      searchInput.value = "";
+      applySearch();
+      searchInput.focus();
+    });
+
+    // ---------- Init ----------
+    renderCalendar();
+    renderSelected();
+    setEmptyState("⏳", "Loading tasks...");
+    emptyEl.style.display = "block";
+    footerEl.style.display = "none";
+
+    // Always try Supabase first; falls back to localStorage if unreachable.
+    function start() { fetchTasks().then(function () { renderList(); }); }
+    start();
+  })();
+  </script>
+</body>
+</html>

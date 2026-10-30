@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tianyi Ma — Home</title>
+  <meta name="description" content="Tianyi Ma — a warm, friendly personal portfolio.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="index.html" class="brand"><span class="brand__dot"></span> Tianyi Ma</a>
+      <button class="nav__toggle" aria-label="Toggle menu"><span></span></button>
+      <nav class="nav__links">
+        <a href="index.html" class="active">Home</a>
+        <a href="resume.html">Resume</a>
+        <span class="nav__item">
+          <a href="projects.html" class="nav__trigger">Projects</a>
+          <span class="nav__dropdown">
+            <a href="mechanics.html"><span class="dd-ico">🪐</span><span><span class="dd-title">Mechanics</span><span class="dd-sub">Gravity playground</span></span></a>
+            <a href="projects.html#todo"><span class="dd-ico">✅</span><span><span class="dd-title">To-do List</span><span class="dd-sub">Daily planner</span></span></a>
+            <a href="weather.html"><span class="dd-ico">⛅</span><span><span class="dd-title">Weather</span><span class="dd-sub">Quick forecast</span></span></a>
+          </span>
+        </span>
+        <a href="contact.html">Contact Me</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero__text">
+        <span class="hero__eyebrow">👋 Nice to meet you</span>
+        <h1>Hi, I'm Tianyi Ma.</h1>
+        <p class="hero__intro">
+          I love the little details that make things feel like home — soft corners,
+          warm words, and a friendly vibe. This is my little corner of the internet.
+        </p>
+        <div class="hero__cta">
+          <a href="resume.html" class="btn btn--primary">See my resume</a>
+          <a href="contact.html" class="btn btn--ghost">Say hello</a>
+        </div>
+      </div>
+      <div class="hero__photo">
+        <img src="photo.jpg" alt="Photo of Tianyi Ma">
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0.5rem;">
+      <div class="section__head">
+        <h2>My Projects</h2>
+        <p>Three little apps — pick one and dive in.</p>
+      </div>
+      <div class="cards">
+        <a class="card" href="mechanics.html" style="text-decoration:none;color:inherit;">
+          <div class="card__emoji">🪐</div>
+          <h3>Mechanics Phenomena Visualized</h3>
+          <p>A dark, futuristic gravity playground — drag to sling planets, watch galaxies and binaries come alive, and tune the universe with sliders.</p>
+          <span class="card__cta">Open physics sim →</span>
+        </a>
+        <a class="card" href="projects.html#todo" style="text-decoration:none;color:inherit;">
+          <div class="card__emoji">✅</div>
+          <h3>To-do List</h3>
+          <p>A friendly little planner — pick a date, jot a task, and keep your days in order.</p>
+          <span class="card__cta">Open to-do list →</span>
+        </a>
+        <a class="card" href="weather.html" style="text-decoration:none;color:inherit;">
+          <div class="card__emoji">⛅</div>
+          <h3>Weather</h3>
+          <p>Look up the weather anywhere in the world with a clean, quick forecast.</p>
+          <span class="card__cta">Open weather app →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <h2>My Favorite Star</h2>
+        <p>One face I never get tired of — the reason a quiet frame can feel warm.</p>
+      </div>
+      <div class="star-card">
+        <div class="star-card__photo">
+          <img src="1030_1.jpg" alt="Portrait of Jackson Yee">
+        </div>
+        <div class="star-card__body">
+          <span class="star-card__tag">✦ My all-time favorite</span>
+          <h3>Jackson Yee</h3>
+          <p>Some people light up a frame without even trying — a quiet glance, a half-smile, and suddenly the whole scene feels softer.</p>
+          <p>Whenever I need a reminder that calm and presence can be magnetic, I come back to this picture. It's a small keepsake of why I keep watching.</p>
+          <span class="star-card__note">★ Forever on my list</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <h2>Three things I like</h2>
+        <p>The small joys that make my days a little brighter.</p>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <div class="card__emoji">📷</div>
+          <h3>Photography</h3>
+          <p>Catching the way light falls on ordinary afternoons and turning them into keepsakes.</p>
+        </article>
+        <article class="card">
+          <div class="card__emoji">☕</div>
+          <h3>A good cup of coffee</h3>
+          <p>Slow mornings, a warm mug, and a few quiet minutes before the day begins.</p>
+        </article>
+        <article class="card">
+          <div class="card__emoji">🌿</div>
+          <h3>Being outdoors</h3>
+          <p>Long walks, fresh air, and the calm that comes from being under a big sky.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="funfact">
+        <strong>🎲 Fun fact</strong>
+        I once fixed a stubborn bug in my sleep — woke up, typed the line, and it just worked.
+      </div>
+      <small>© <span id="year">2026</span> Tianyi Ma · Made with care</small>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
